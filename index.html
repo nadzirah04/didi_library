@@ -1,0 +1,1420 @@
+
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perpustakaan Ajaib Didi & Friends</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  background: #0b1730;
+  color: white;
+}
+
+button, input, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* ===== DUNIA PERPUSTAKAAN ===== */
+
+#scene {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #142540;
+  touch-action: none;
+}
+
+#world {
+  position: absolute;
+  width: 1650px;
+  height: 928px;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  background-image: url("library.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  will-change: transform;
+}
+
+/* Kesan cahaya di atas gambar */
+
+#world::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(8, 18, 37, .17),
+    transparent 45%
+  );
+}
+
+/* ===== EMPAT ZON PEMBELAJARAN ===== */
+
+.zone {
+  position: absolute;
+  z-index: 3;
+  border: 3px solid transparent;
+  border-radius: 30px;
+  cursor: pointer;
+  transition:
+    border-color .2s,
+    box-shadow .2s,
+    background .2s;
+}
+
+.zone:hover,
+.zone.near {
+  border-color: rgba(255,255,255,.8);
+  background: rgba(255,255,255,.08);
+  box-shadow:
+    0 0 30px rgba(255,255,255,.6),
+    inset 0 0 30px rgba(255,255,255,.2);
+}
+
+.zone:focus-visible {
+  outline: 4px solid #ffe36c;
+}
+
+.zone span {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(13,27,51,.94);
+  color: white;
+  padding: 9px 15px;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: bold;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+
+.zone:hover span,
+.zone.near span {
+  opacity: 1;
+}
+
+/* ===== WATAK PAK ATAN ===== */
+
+.player {
+  position: absolute;
+  z-index: 6;
+  width: 105px;
+  height: 130px;
+  pointer-events: none;
+  transform: translate(-50%, -87%);
+  filter: drop-shadow(0 10px 7px rgba(0,0,0,.5));
+}
+
+.pak-atan-character {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  transform-origin: center bottom;
+}
+
+/* Animasi berjalan */
+
+.player.walk .pak-atan-character {
+  animation: pakAtanWalk .25s ease-in-out infinite alternate;
+}
+
+@keyframes pakAtanWalk {
+  from {
+    translate: 0 0;
+    rotate: -4deg;
+  }
+
+  to {
+    translate: 0 -8px;
+    rotate: 4deg;
+  }
+}
+
+/* Animasi berhenti */
+
+.player:not(.walk) .pak-atan-character {
+  animation: pakAtanIdle 2s ease-in-out infinite;
+}
+
+@keyframes pakAtanIdle {
+  0%, 100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -4px;
+  }
+}
+
+/* Bayang watak */
+
+.player-shadow {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 75px;
+  height: 18px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: rgba(0,0,0,.28);
+  filter: blur(5px);
+  z-index: -1;
+}
+
+/* ===== KESAN PARTIKEL ===== */
+
+.sparkle {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff3b1;
+  box-shadow: 0 0 14px #ffdf74;
+  pointer-events: none;
+  z-index: 2;
+  animation: sparkleFloat 3s ease-in-out infinite alternate;
+}
+
+@keyframes sparkleFloat {
+  from {
+    opacity: .15;
+    translate: 0 0;
+    scale: .6;
+  }
+
+  to {
+    opacity: .85;
+    translate: 0 -25px;
+    scale: 1.2;
+  }
+}
+
+/* ===== PAPARAN MAKLUMAT ===== */
+
+#hud {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 20;
+  width: min(370px, 65vw);
+  padding: 15px 18px;
+  border-radius: 20px;
+  background: rgba(10,24,48,.83);
+  border: 1px solid rgba(255,255,255,.3);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 35px rgba(0,0,0,.25);
+}
+
+#hud strong {
+  font-size: 18px;
+}
+
+#hud small {
+  display: block;
+  margin-top: 6px;
+  color: #e2ecff;
+  line-height: 1.5;
+}
+
+#nearNotice {
+  margin-top: 9px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: rgba(255,216,103,.2);
+  color: #fff1a9;
+  font-weight: bold;
+  font-size: 13px;
+  display: none;
+}
+
+/* ===== BUTANG GURU ===== */
+
+#edit {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 20;
+  padding: 12px 17px;
+  border: 1px solid rgba(255,255,255,.4);
+  border-radius: 15px;
+  background: rgba(10,24,48,.88);
+  color: white;
+  font-weight: bold;
+}
+
+/* ===== KAWALAN KAMERA ===== */
+
+#cameraControls {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px;
+  background: rgba(10,24,48,.8);
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,.3);
+}
+
+#cameraControls button {
+  border: 0;
+  background: #e6f0ff;
+  color: #17355b;
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-weight: bold;
+}
+
+#zoomText {
+  min-width: 48px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+#controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  padding: 12px 17px;
+  border-radius: 18px;
+  background: rgba(10,24,48,.82);
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid rgba(255,255,255,.3);
+}
+
+/* ===== MODAL ===== */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  background: rgba(4,12,29,.78);
+}
+
+.modal.show {
+  display: flex;
+}
+
+.panel {
+  width: min(680px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 26px;
+  border-radius: 25px;
+  background: #f8faff;
+  color: #1b2d4c;
+  box-shadow: 0 20px 80px rgba(0,0,0,.5);
+}
+
+.panel h2 {
+  margin-top: 0;
+}
+
+.panel p {
+  color: #50617a;
+  line-height: 1.6;
+}
+
+.close {
+  float: right;
+  border: 0;
+  padding: 8px 12px;
+  background: #e6eaf3;
+  border-radius: 10px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0;
+  padding: 13px;
+  background: white;
+  border: 1px solid #d7e0f2;
+  border-radius: 14px;
+}
+
+.item a {
+  color: #1459b5;
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+
+.pill {
+  border: 0;
+  border-radius: 11px;
+  padding: 9px 13px;
+  background: #e5efff;
+  color: #164b92;
+  font-weight: bold;
+}
+
+.danger {
+  background: #ffe4e4;
+  color: #a32222;
+}
+
+.primary {
+  padding: 12px 18px;
+  background: #1264c5;
+  color: white;
+  border: 0;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+input, select {
+  width: 100%;
+  padding: 11px;
+  margin: 6px 0 14px;
+  border: 1px solid #c5d0e2;
+  border-radius: 10px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.help {
+  font-size: 12px;
+  color: #64738c;
+}
+
+/* ===== MOBILE ===== */
+
+.mobile {
+  display: none;
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  z-index: 22;
+  grid-template-columns: repeat(3, 44px);
+  gap: 5px;
+}
+
+.mobile button {
+  height: 44px;
+  border: 1px solid #ffffff88;
+  border-radius: 11px;
+  background: rgba(13,31,61,.85);
+  color: white;
+  font-weight: bold;
+  touch-action: none;
+}
+
+.mobile .action {
+  grid-column: 3;
+  grid-row: 2;
+  background: #f4c755;
+  color: #24324b;
+}
+
+@media (max-width: 800px) {
+  #hud {
+    padding: 10px;
+    width: 60vw;
+  }
+
+  #hud strong {
+    font-size: 13px;
+  }
+
+  #hud small {
+    font-size: 11px;
+  }
+
+  #edit {
+    font-size: 11px;
+    padding: 9px;
+  }
+
+  .mobile {
+    display: grid;
+  }
+
+  #controls {
+    display: none;
+  }
+
+  #cameraControls {
+    bottom: 15px;
+    right: 10px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== PERPUSTAKAAN ===== -->
+
+<div id="scene">
+  <div id="world">
+
+    <!-- ZON HIJAU -->
+    <div
+      class="zone"
+      data-id="lemah"
+      style="left:3%;top:33%;width:21%;height:31%"
+      tabindex="0"
+      role="button"
+      aria-label="Bahan Pembelajaran Murid Lemah">
+      <span>📗 Murid Lemah</span>
+    </div>
+
+    <!-- ZON KUNING -->
+    <div
+      class="zone"
+      data-id="sederhana"
+      style="left:27%;top:38%;width:16%;height:26%"
+      tabindex="0"
+      role="button"
+      aria-label="Bahan Pembelajaran Murid Sederhana">
+      <span>📙 Murid Sederhana</span>
+    </div>
+
+    <!-- ZON MERAH JAMBU -->
+    <div
+      class="zone"
+      data-id="cemerlang"
+      style="left:57%;top:38%;width:17%;height:26%"
+      tabindex="0"
+      role="button"
+      aria-label="Bahan Pembelajaran Murid Cemerlang">
+      <span>🌟 Murid Cemerlang</span>
+    </div>
+
+    <!-- ZON BIRU -->
+    <div
+      class="zone"
+      data-id="guru"
+      style="left:77%;top:33%;width:20%;height:31%"
+      tabindex="0"
+      role="button"
+      aria-label="Panduan Guru">
+      <span>🎓 Panduan Guru</span>
+    </div>
+
+    <!-- PAK ATAN -->
+    <div class="player" id="player">
+      <div class="player-shadow"></div>
+      <img
+        src="pak-atan.png"
+        class="pak-atan-character"
+        alt="Pak Atan"
+        draggable="false">
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== HUD ===== -->
+
+<div id="hud">
+  <strong>✨ Perpustakaan Ajaib Didi & Friends</strong>
+  <small>
+    Jom teroka perpustakaan bersama Pak Atan!
+    Gunakan WASD untuk berjalan dan dekati rak buku.
+  </small>
+  <div id="nearNotice"></div>
+</div>
+
+<button id="edit">⚙️ Urus Bahan Guru</button>
+
+<div id="controls">
+  ⌨️ WASD / ↑ ↓ ← → untuk berjalan
+  <br>
+  🖱️ Scroll untuk zoom | Tekan E untuk membaca
+</div>
+
+<!-- ===== KAWALAN ZOOM ===== -->
+
+<div id="cameraControls">
+  <button id="zoomOut" aria-label="Zoom keluar">−</button>
+  <span id="zoomText">100%</span>
+  <button id="zoomIn" aria-label="Zoom masuk">+</button>
+  <button id="resetCamera" aria-label="Reset kamera">⌂</button>
+</div>
+
+<!-- ===== KAWALAN MOBILE ===== -->
+
+<div class="mobile">
+  <span></span>
+  <button data-move="up">▲</button>
+  <span></span>
+  <button data-move="left">◀</button>
+  <button data-move="down">▼</button>
+  <button data-move="right">▶</button>
+  <button class="action" id="mobileE">E</button>
+</div>
+
+<!-- ===== MODAL ===== -->
+
+<div class="modal" id="modal">
+  <div class="panel">
+    <button class="close" id="close">✕ Tutup</button>
+    <div id="content"></div>
+  </div>
+</div>
+
+<script>
+
+/* ===== TETAPAN ZON ===== */
+
+const Z = {
+  lemah: {
+    name: "📗 Bahan Pembelajaran Murid Lemah",
+    x: .15,
+    y: .67
+  },
+  sederhana: {
+    name: "📙 Bahan Pembelajaran Murid Sederhana",
+    x: .35,
+    y: .67
+  },
+  cemerlang: {
+    name: "🌟 Bahan Pembelajaran Murid Cemerlang",
+    x: .65,
+    y: .67
+  },
+  guru: {
+    name: "🎓 Panduan Guru",
+    x: .85,
+    y: .67
+  }
+};
+
+/* ===== BAHAN PEMBELAJARAN ===== */
+
+const STORAGE_KEY = "didi-library-materials-v1";
+
+let materials = {
+  lemah: [],
+  sederhana: [],
+  cemerlang: [],
+  guru: []
+};
+
+try {
+  const saved = JSON.parse(
+    localStorage.getItem(STORAGE_KEY)
+  );
+
+  if (saved) {
+    for (const k of Object.keys(Z)) {
+      materials[k] = Array.isArray(saved[k])
+        ? saved[k]
+        : [];
+    }
+  }
+} catch (error) {
+  console.warn("Gagal membaca bahan:", error);
+}
+
+function saveMaterials() {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(materials)
+  );
+}
+
+/* ===== ELEMEN ===== */
+
+const scene = document.getElementById("scene");
+const world = document.getElementById("world");
+const player = document.getElementById("player");
+const pakAtan = document.querySelector(
+  ".pak-atan-character"
+);
+const modal = document.getElementById("modal");
+const content = document.getElementById("content");
+const nearNotice = document.getElementById("nearNotice");
+const zoomText = document.getElementById("zoomText");
+
+/* ===== KEDUDUKAN WATAK ===== */
+
+let px = .5;
+let py = .79;
+let near = null;
+let active = null;
+let editing = false;
+
+const keys = new Set();
+
+/* ===== SISTEM KAMERA ===== */
+
+const WORLD_WIDTH = 1650;
+const WORLD_HEIGHT = 928;
+
+let cameraX = WORLD_WIDTH / 2;
+let cameraY = WORLD_HEIGHT / 2;
+
+let cameraZoom = 1;
+let targetZoom = 1;
+let userZoom = 1;
+
+let cameraInitialized = false;
+
+const MIN_ZOOM = .8;
+const MAX_ZOOM = 2.2;
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function getBaseScale() {
+  return Math.max(
+    scene.clientWidth / WORLD_WIDTH,
+    scene.clientHeight / WORLD_HEIGHT
+  );
+}
+
+function updateZoomLabel() {
+  zoomText.textContent =
+    Math.round(userZoom * 100) + "%";
+}
+
+function changeZoom(amount) {
+  userZoom = clamp(
+    userZoom + amount,
+    MIN_ZOOM,
+    MAX_ZOOM
+  );
+
+  updateZoomLabel();
+}
+
+/* ===== KAMERA IKUT PAK ATAN ===== */
+
+function updateCamera() {
+  const baseScale = getBaseScale();
+
+  /*
+    Kamera zoom sedikit apabila menghampiri zon.
+    Nilai boleh diubah mengikut kesesuaian.
+  */
+
+  const automaticZoom = near ? 1.15 : 1;
+
+  targetZoom = clamp(
+    userZoom * automaticZoom,
+    MIN_ZOOM,
+    MAX_ZOOM
+  );
+
+  cameraZoom += (
+    targetZoom - cameraZoom
+  ) * .07;
+
+  /*
+    Sasaran kamera mengikuti Pak Atan.
+    Sedikit offset ke atas untuk menampakkan rak.
+  */
+
+  const targetX = px * WORLD_WIDTH;
+  const targetY = py * WORLD_HEIGHT - 90;
+
+  if (!cameraInitialized) {
+    cameraX = targetX;
+    cameraY = targetY;
+    cameraZoom = targetZoom;
+    cameraInitialized = true;
+  }
+
+  cameraX += (targetX - cameraX) * .085;
+  cameraY += (targetY - cameraY) * .085;
+
+  const finalScale = baseScale * cameraZoom;
+
+  /*
+    Had kamera supaya bahagian luar gambar
+    tidak kelihatan apabila zoom masuk.
+  */
+
+  const visibleWorldWidth =
+    scene.clientWidth / finalScale;
+
+  const visibleWorldHeight =
+    scene.clientHeight / finalScale;
+
+  const halfW = visibleWorldWidth / 2;
+  const halfH = visibleWorldHeight / 2;
+
+  let viewX;
+  let viewY;
+
+  if (visibleWorldWidth >= WORLD_WIDTH) {
+    viewX = WORLD_WIDTH / 2;
+  } else {
+    viewX = clamp(
+      cameraX,
+      halfW,
+      WORLD_WIDTH - halfW
+    );
+  }
+
+  if (visibleWorldHeight >= WORLD_HEIGHT) {
+    viewY = WORLD_HEIGHT / 2;
+  } else {
+    viewY = clamp(
+      cameraY,
+      halfH,
+      WORLD_HEIGHT - halfH
+    );
+  }
+
+  const offsetX =
+    scene.clientWidth / 2 - viewX * finalScale;
+
+  const offsetY =
+    scene.clientHeight / 2 - viewY * finalScale;
+
+  world.style.transform = `
+    translate(${offsetX}px, ${offsetY}px)
+    scale(${finalScale})
+  `;
+}
+
+/* ===== ZON BERDEKATAN ===== */
+
+function updatePlayer() {
+  player.style.left = (px * 100) + "%";
+  player.style.top = (py * 100) + "%";
+
+  let closest = null;
+  let distance = Infinity;
+
+  for (const [key, zone] of Object.entries(Z)) {
+    const d = Math.hypot(
+      (px - zone.x) * 1.25,
+      (py - zone.y) * 1.5
+    );
+
+    if (d < distance) {
+      distance = d;
+      closest = key;
+    }
+  }
+
+  near = distance < .18 ? closest : null;
+
+  document.querySelectorAll(".zone").forEach(el => {
+    el.classList.toggle(
+      "near",
+      el.dataset.id === near
+    );
+  });
+
+  if (near) {
+    nearNotice.style.display = "block";
+    nearNotice.textContent =
+      "✨ Tekan E untuk masuk: " + Z[near].name;
+  } else {
+    nearNotice.style.display = "none";
+  }
+}
+
+/* ===== ANIMASI PERGERAKAN ===== */
+
+let lastTime = performance.now();
+
+function gameLoop(now) {
+  const delta = Math.min(
+    (now - lastTime) / 16.667,
+    2
+  );
+
+  lastTime = now;
+
+  if (!modal.classList.contains("show")) {
+    let dx = 0;
+    let dy = 0;
+
+    if (keys.has("a") || keys.has("arrowleft")) {
+      dx--;
+    }
+
+    if (keys.has("d") || keys.has("arrowright")) {
+      dx++;
+    }
+
+    if (keys.has("w") || keys.has("arrowup")) {
+      dy--;
+    }
+
+    if (keys.has("s") || keys.has("arrowdown")) {
+      dy++;
+    }
+
+    const moving = dx !== 0 || dy !== 0;
+
+    player.classList.toggle("walk", moving);
+
+    if (dx < 0) {
+      pakAtan.style.scale = "-1 1";
+    } else if (dx > 0) {
+      pakAtan.style.scale = "1 1";
+    }
+
+    if (moving) {
+      const length = Math.hypot(dx, dy);
+
+      const speedX = .0033 * delta;
+      const speedY = .0025 * delta;
+
+      px = clamp(
+        px + (dx / length) * speedX,
+        .05,
+        .95
+      );
+
+      py = clamp(
+        py + (dy / length) * speedY,
+        .61,
+        .93
+      );
+
+      updatePlayer();
+    }
+  } else {
+    player.classList.remove("walk");
+  }
+
+  updateCamera();
+
+  requestAnimationFrame(gameLoop);
+}
+
+/* ===== ZOOM MENGGUNAKAN TETIKUS ===== */
+
+scene.addEventListener("wheel", e => {
+  e.preventDefault();
+
+  changeZoom(e.deltaY < 0 ? .1 : -.1);
+}, { passive: false });
+
+document.getElementById("zoomIn").onclick = () => {
+  changeZoom(.15);
+};
+
+document.getElementById("zoomOut").onclick = () => {
+  changeZoom(-.15);
+};
+
+document.getElementById("resetCamera").onclick = () => {
+  userZoom = 1;
+  updateZoomLabel();
+};
+
+/* ===== PARTIKEL CAHAYA ===== */
+
+function createSparkles() {
+  const positions = [
+    [17, 47],
+    [34, 50],
+    [50, 45],
+    [66, 50],
+    [83, 47],
+    [50, 72],
+    [46, 64],
+    [55, 61]
+  ];
+
+  positions.forEach(([x, y], index) => {
+    const sparkle = document.createElement("div");
+
+    sparkle.className = "sparkle";
+    sparkle.style.left = x + "%";
+    sparkle.style.top = y + "%";
+    sparkle.style.animationDelay =
+      (index * .37) + "s";
+
+    world.appendChild(sparkle);
+  });
+}
+
+/* ===== KESELAMATAN PAUTAN ===== */
+
+function escapeHTML(value) {
+  return String(value).replace(
+    /[&<>"']/g,
+    character => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[character])
+  );
+}
+
+function safeUrl(value) {
+  try {
+    const url = new URL(value);
+
+    return ["http:", "https:"].includes(url.protocol)
+      ? url.href
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+/* ===== BUKA BAHAN ===== */
+
+function showZone(id) {
+  if (!Z[id]) return;
+
+  active = id;
+  editing = false;
+
+  renderMaterials();
+
+  modal.classList.add("show");
+  keys.clear();
+}
+
+/* ===== SENARAI BAHAN ===== */
+
+function renderMaterials() {
+  const zone = Z[active];
+
+  content.innerHTML = `
+    <h2>${zone.name}</h2>
+    <p>
+      Pilih bahan pembelajaran yang ingin diterokai.
+      Klik pautan untuk membuka bahan.
+    </p>
+    <div id="materialList"></div>
+  `;
+
+  const list = document.getElementById("materialList");
+
+  if (materials[active].length === 0) {
+    list.innerHTML = `
+      <p>
+        📚 Belum ada bahan dimasukkan.
+        Guru boleh menambah bahan melalui
+        menu Urus Bahan Guru.
+      </p>
+    `;
+  }
+
+  materials[active].forEach((material, index) => {
+    const url = safeUrl(material.url);
+
+    if (!url) return;
+
+    const row = document.createElement("div");
+    row.className = "item";
+
+    row.innerHTML = `
+      <div>
+        📖
+        <a
+          href="${escapeHTML(url)}"
+          target="_blank"
+          rel="noopener noreferrer">
+          ${escapeHTML(material.title)}
+        </a>
+        <div class="help">
+          ${escapeHTML(
+            material.type || "Bahan pembelajaran"
+          )}
+        </div>
+      </div>
+
+      ${
+        editing
+          ? `<button class="pill danger"
+               data-delete="${index}">
+               Padam
+             </button>`
+          : "<span>↗</span>"
+      }
+    `;
+
+    list.appendChild(row);
+  });
+
+  if (editing) {
+    const form = document.createElement("form");
+
+    form.innerHTML = `
+      <hr>
+
+      <h3>➕ Tambah Bahan Baharu</h3>
+
+      <label>Nama bahan</label>
+      <input
+        name="title"
+        required
+        maxlength="120"
+        placeholder="Contoh: Misi Membaca Suku Kata">
+
+      <label>Pautan bahan</label>
+      <input
+        name="url"
+        type="url"
+        required
+        placeholder="https://...">
+
+      <label>Jenis bahan</label>
+      <select name="type">
+        <option>Aktiviti Interaktif</option>
+        <option>Nota / PDF</option>
+        <option>Video</option>
+        <option>Permainan</option>
+        <option>Kuiz</option>
+        <option>Lain-lain</option>
+      </select>
+
+      <button class="primary" type="submit">
+        Simpan Bahan
+      </button>
+
+      <p class="help">
+        Bahan disimpan pada browser ini sahaja.
+        Eksport JSON untuk memindahkan senarai
+        pautan ke peranti lain.
+      </p>
+    `;
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+
+      const data = new FormData(form);
+      const url = safeUrl(data.get("url"));
+
+      if (!url) {
+        alert("Masukkan pautan yang sah.");
+        return;
+      }
+
+      materials[active].push({
+        title: String(data.get("title")).trim(),
+        url: url,
+        type: String(data.get("type"))
+      });
+
+      saveMaterials();
+      renderMaterials();
+    });
+
+    content.appendChild(form);
+
+    content.querySelectorAll("[data-delete]").forEach(
+      button => {
+        button.onclick = () => {
+          if (confirm("Padam bahan ini?")) {
+            materials[active].splice(
+              Number(button.dataset.delete),
+              1
+            );
+
+            saveMaterials();
+            renderMaterials();
+          }
+        };
+      }
+    );
+  }
+}
+
+/* ===== PENGURUSAN GURU ===== */
+
+function openAdmin() {
+  editing = false;
+
+  modal.classList.add("show");
+  keys.clear();
+
+  content.innerHTML = `
+    <h2>⚙️ Pengurusan Bahan Guru</h2>
+
+    <p>
+      Pilih ruangan untuk menambah atau
+      memadam pautan bahan pembelajaran.
+    </p>
+
+    <div id="adminList"></div>
+
+    <hr>
+
+    <h3>💾 Simpan dan Kongsi Bahan</h3>
+
+    <button class="pill" id="exportJSON">
+      ⬇️ Eksport JSON
+    </button>
+
+    <label class="pill" for="importJSON">
+      ⬆️ Import JSON
+    </label>
+
+    <input
+      type="file"
+      id="importJSON"
+      accept=".json,application/json"
+      style="display:none">
+
+    <p class="help">
+      Sistem ini belum mempunyai akaun guru
+      atau perlindungan kata laluan.
+      Jangan simpan maklumat sulit.
+    </p>
+  `;
+
+  const list = document.getElementById("adminList");
+
+  Object.entries(Z).forEach(([key, zone]) => {
+    const button = document.createElement("button");
+
+    button.className = "item";
+    button.style.width = "100%";
+
+    button.innerHTML = `
+      <strong>${zone.name}</strong>
+      <span class="pill">
+        Urus (${materials[key].length}) →
+      </span>
+    `;
+
+    button.onclick = () => {
+      active = key;
+      editing = true;
+      renderMaterials();
+    };
+
+    list.appendChild(button);
+  });
+
+  /* EKSPORT */
+
+  document.getElementById("exportJSON").onclick = () => {
+    const blob = new Blob(
+      [JSON.stringify(materials, null, 2)],
+      { type: "application/json" }
+    );
+
+    const link = document.createElement("a");
+
+    link.href = URL.createObjectURL(blob);
+    link.download = "bahan-perpustakaan-didi.json";
+
+    link.click();
+
+    setTimeout(() => {
+      URL.revokeObjectURL(link.href);
+    }, 1000);
+  };
+
+  /* IMPORT */
+
+  document.getElementById("importJSON").onchange =
+    async e => {
+      try {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const data = JSON.parse(await file.text());
+
+        for (const key of Object.keys(Z)) {
+          if (!Array.isArray(data[key])) {
+            throw Error("Format JSON tidak lengkap.");
+          }
+
+          data[key].forEach(item => {
+            if (!item.title || !safeUrl(item.url)) {
+              throw Error("Pautan tidak sah.");
+            }
+          });
+        }
+
+        if (confirm("Gantikan semua bahan sedia ada?")) {
+          materials = Object.fromEntries(
+            Object.keys(Z).map(key => [
+              key,
+              data[key].map(item => ({
+                title: String(item.title),
+                url: String(item.url),
+                type: String(
+                  item.type || "Bahan pembelajaran"
+                )
+              }))
+            ])
+          );
+
+          saveMaterials();
+          openAdmin();
+        }
+      } catch (error) {
+        alert(
+          "Gagal import JSON: " + error.message
+        );
+      }
+    };
+}
+
+/* ===== INTERAKSI ZON ===== */
+
+document.querySelectorAll(".zone").forEach(zone => {
+  zone.addEventListener("click", () => {
+    showZone(zone.dataset.id);
+  });
+
+  zone.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      showZone(zone.dataset.id);
+    }
+  });
+});
+
+/* ===== MODAL ===== */
+
+document.getElementById("edit").onclick = openAdmin;
+
+function closeModal() {
+  modal.classList.remove("show");
+  keys.clear();
+}
+
+document.getElementById("close").onclick = closeModal;
+
+modal.addEventListener("click", e => {
+  if (e.target === modal) {
+    closeModal();
+  }
+});
+
+/* ===== KEYBOARD ===== */
+
+window.addEventListener("keydown", e => {
+  const key = e.key.toLowerCase();
+
+  if (
+    ["arrowup", "arrowdown", "arrowleft",
+     "arrowright", " "].includes(key) &&
+    !e.target.matches("input,select,textarea")
+  ) {
+    e.preventDefault();
+  }
+
+  if (e.target.matches("input,select,textarea")) {
+    return;
+  }
+
+  if (key === "escape") {
+    closeModal();
+    return;
+  }
+
+  if (modal.classList.contains("show")) {
+    return;
+  }
+
+  keys.add(key);
+
+  if (key === "e" && near) {
+    showZone(near);
+  }
+});
+
+window.addEventListener("keyup", e => {
+  keys.delete(e.key.toLowerCase());
+});
+
+window.addEventListener("blur", () => {
+  keys.clear();
+});
+
+/* ===== KAWALAN TELEFON ===== */
+
+document.querySelectorAll("[data-move]").forEach(
+  button => {
+    const key = {
+      up: "w",
+      down: "s",
+      left: "a",
+      right: "d"
+    }[button.dataset.move];
+
+    button.addEventListener("pointerdown", e => {
+      e.preventDefault();
+      keys.add(key);
+      button.setPointerCapture(e.pointerId);
+    });
+
+    [
+      "pointerup",
+      "pointercancel",
+      "lostpointercapture"
+    ].forEach(eventName => {
+      button.addEventListener(eventName, () => {
+        keys.delete(key);
+      });
+    });
+  }
+);
+
+document.getElementById("mobileE").onclick = () => {
+  if (near) {
+    showZone(near);
+  } else {
+    alert(
+      "Gerakkan Pak Atan lebih dekat ke rak buku."
+    );
+  }
+};
+
+/* ===== MULA PERMAINAN ===== */
+
+window.addEventListener("resize", () => {
+  cameraInitialized = false;
+});
+
+createSparkles();
+updatePlayer();
+updateZoomLabel();
+
+requestAnimationFrame(gameLoop);
+
+</script>
+</body>
+</html>
